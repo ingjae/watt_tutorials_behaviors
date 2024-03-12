@@ -4,8 +4,8 @@
 
 	<executable package_path="watt_tutorials_flexbe_behaviors.example_behavior_sm" class="ExampleBehaviorSM" />
 	<tagstring>demo</tagstring>
-	<author>Philipp Schillinger</author>
-	<date>Fri Aug 21 2015</date>
+	<author>Myungsang Park</author>
+	<date>Thu Mar 12 2024</date>
 	<description>
 		This is a simple example for a behavior.
 	</description>
@@ -16,7 +16,7 @@
 	<!-- Available Parameters -->
 	<params>
 
-		<param type="numeric" name="waiting_time" default="3" label="Waiting Time" hint="Sets the time to wait after logging.">
+		<param type="numeric" name="param_a" default="3" label="param_a" hint="Sets the time to wait after logging.">
 			<min value="1" />
 			<max value="5" />
 		</param>

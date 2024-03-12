@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 ###########################################################
 #               WARNING: Generated code!                  #
 #              **************************                 #
@@ -6,9 +7,10 @@
 # Only code inside the [MANUAL] tags will be kept.        #
 ###########################################################
 
-from flexbe_core import Behavior, Autonomy, OperatableStateMachine, Logger
-from flexbe_states.log_state import LogState
-from flexbe_states.wait_state import WaitState
+from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
+from watt_tutorials_flexbe_states.key_topic_sum_to_topic_state import KeyTopicSumToTopicState
+from watt_tutorials_flexbe_states.logging_key_times_state import LoggingKeyTimesState
+from watt_tutorials_flexbe_states.userdata_sum_to_key_state import UserdataSumToKeyState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -16,8 +18,8 @@ from flexbe_states.wait_state import WaitState
 
 
 '''
-Created on Fri Aug 21 2015
-@author: Philipp Schillinger
+Created on Thu Mar 12 2024
+@author: Myungsang Park
 '''
 class ExampleBehaviorSM(Behavior):
 	'''
@@ -30,7 +32,7 @@ class ExampleBehaviorSM(Behavior):
 		self.name = 'Example Behavior'
 
 		# parameters of this behavior
-		self.add_parameter('waiting_time', 3)
+		self.add_parameter('param_a', 3)
 
 		# references to used behaviors
 
@@ -41,15 +43,12 @@ class ExampleBehaviorSM(Behavior):
 
 		# Behavior comments:
 
-		# O 172 147 
-		# This transition will only be executed if the Autonomy Level is greater than Low during execution, e.g. High
-
 
 
 	def create(self):
-		log_msg = "Hello World!"
-		# x:83 y:390
-		_state_machine = OperatableStateMachine(outcomes=['finished'])
+		param_b = 4
+		# x:783 y:40, x:383 y:190
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -58,17 +57,26 @@ class ExampleBehaviorSM(Behavior):
 
 
 		with _state_machine:
-			# x:52 y:78
-			OperatableStateMachine.add('Print_Message',
-										LogState(text=log_msg, severity=Logger.REPORT_HINT),
-										transitions={'done': 'Wait_After_Logging'},
-										autonomy={'done': Autonomy.Low})
+			# x:74 y:24
+			OperatableStateMachine.add('example_state_1',
+										UserdataSumToKeyState(num_1=self.param_a, num_2=param_b),
+										transitions={'continue': 'example_state_2', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'sum_result': 'sum_result'})
 
-			# x:40 y:228
-			OperatableStateMachine.add('Wait_After_Logging',
-										WaitState(wait_time=self.waiting_time),
-										transitions={'done': 'finished'},
-										autonomy={'done': Autonomy.Off})
+			# x:324 y:24
+			OperatableStateMachine.add('example_state_2',
+										KeyTopicSumToTopicState(),
+										transitions={'continue': 'example_state_3', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'input_num': 'sum_result', 'sum_result': 'log_print'})
+
+			# x:574 y:24
+			OperatableStateMachine.add('example_state_3',
+										LoggingKeyTimesState(log_msg="HELLow FlexBE"),
+										transitions={'continue': 'finished', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'log_print': 'log_print'})
 
 
 		return _state_machine
